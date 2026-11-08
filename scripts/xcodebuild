@@ -1,0 +1,8 @@
+#!/bin/bash
+# Xcode signs Lines with a profile that has push (aps-environment). With no Apple account in Xcode, it can make that
+# profile only with an App Store Connect API key. `bun run install-ios` puts this folder first in PATH, and .env gives
+# APPLE_API_KEY, APPLE_API_ISSUER and APPLE_API_KEY_PATH. Without them, xcodebuild runs as it is.
+if [ -n "$APPLE_API_KEY" ] && [ -n "$APPLE_API_ISSUER" ] && [ -n "$APPLE_API_KEY_PATH" ] && [[ " $* " == *" -allowProvisioningUpdates "* ]]; then
+  exec /usr/bin/xcodebuild "$@" -authenticationKeyPath "$APPLE_API_KEY_PATH" -authenticationKeyID "$APPLE_API_KEY" -authenticationKeyIssuerID "$APPLE_API_ISSUER"
+fi
+exec /usr/bin/xcodebuild "$@"

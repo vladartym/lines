@@ -1,0 +1,5 @@
+django==5.2.8
+django-ninja==1.4.5
+gunicorn==23.0.0
+httpx[http2]==0.28.1
+pyjwt[crypto]==2.10.1

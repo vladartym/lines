@@ -1,0 +1,18 @@
+# Caddy gets the TLS certificate for SERVER_HOST by itself.
+{$SERVER_HOST} {
+	# The websocket of the app. Django checks the API key in the URL first, so only the app reaches Asterisk. The
+	# upgrade headers are left off that check, because the check is a plain request.
+	@phonews path /phone/ws
+	handle @phonews {
+		forward_auth 127.0.0.1:8000 {
+			uri /phone/allow
+			header_up -Upgrade
+			header_up -Connection
+		}
+		rewrite * /ws
+		reverse_proxy 127.0.0.1:8088
+	}
+	handle {
+		reverse_proxy 127.0.0.1:8000
+	}
+}

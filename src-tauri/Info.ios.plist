@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>NSMicrophoneUsageDescription</key>
+  <string>Lines uses the microphone for your calls.</string>
+  <key>NSContactsUsageDescription</key>
+  <string>Lines shows the names of your contacts and lets you pick one to call or text.</string>
+  <!-- The + of a text: the camera and the photo library of the system picker. -->
+  <key>NSCameraUsageDescription</key>
+  <string>Lines uses the camera to take a photo for a text.</string>
+  <key>NSPhotoLibraryUsageDescription</key>
+  <string>Lines adds a photo from your library to a text.</string>
+  <!-- A call goes on when the phone locks: iOS keeps the app open while it plays audio. -->
+  <key>UIBackgroundModes</key>
+  <array>
+    <string>audio</string>
+  </array>
+</dict>
+</plist>

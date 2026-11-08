@@ -1,0 +1,14 @@
+{
+  "$schema": "../gen/schemas/mobile-schema.json",
+  "identifier": "mobile",
+  "description": "The iPhone: the APNs token for the push of texts and calls.",
+  "windows": [
+    "main"
+  ],
+  "platforms": [
+    "iOS"
+  ],
+  "permissions": [
+    "notifications:default"
+  ]
+}

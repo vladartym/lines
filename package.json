@@ -1,0 +1,30 @@
+{
+  "name": "lines",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "tauri": "tauri",
+    "install-app": "unset FORCE_COLOR; S=$(sed -n \"s/^MAC_SIGNING_IDENTITY=//p\" .env 2>/dev/null); if [ -n \"$S\" ]; then export APPLE_SIGNING_IDENTITY=\"$S\"; fi; tauri build && (pkill -x lines; sleep 1; rm -rf ~/Applications/Lines.app && mv src-tauri/target/release/bundle/macos/Lines.app ~/Applications/ && open ~/Applications/Lines.app)",
+    "install-ios": "unset FORCE_COLOR; set -a; . ./.env; set +a; : ${IPHONE:?Set IPHONE in .env}; PATH=\"$PWD/scripts:$PATH\" tauri ios build --target aarch64 --debug && xcrun devicectl device install app --device \"$IPHONE\" src-tauri/gen/apple/build/arm64/Lines.ipa",
+    "sim": "unset FORCE_COLOR; set -a; . ./.env; set +a; S=${SIM:-booted}; tauri ios build --target aarch64-sim --debug && (xcrun simctl boot $S 2>/dev/null; xcrun simctl install $S src-tauri/gen/apple/build/arm64-sim/Lines.app && xcrun simctl launch --terminate-running-process $S com.vladartym.lines)"
+  },
+  "dependencies": {
+    "@choochmeque/tauri-plugin-notifications-api": "0.5.0-rc.14",
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-http": "^2.8.3",
+    "jssip": "^3.13.9",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^6.0.2",
+    "typescript": "~6.0.3",
+    "vite": "^8.0.16",
+    "@tauri-apps/cli": "^2"
+  }
+}

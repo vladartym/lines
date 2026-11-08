@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <!-- The SwiftUI tab bar needs macOS 26 (build.rs). It is set here and not as minimumSystemVersion in tauri.conf.json,
+       because that sets MACOSX_DEPLOYMENT_TARGET, and with 26.0 the linker of macOS 27 makes proc-macro dylibs that
+       dyld refuses (the same trap as in Yonder). -->
+  <key>LSMinimumSystemVersion</key>
+  <string>26.0</string>
+  <key>NSMicrophoneUsageDescription</key>
+  <string>Lines uses the microphone for your calls.</string>
+  <key>NSContactsUsageDescription</key>
+  <string>Lines shows the names of your contacts and lets you pick one to call or text.</string>
+</dict>
+</plist>

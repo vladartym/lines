@@ -1,0 +1,66 @@
+# The Lines server: Caddy (HTTPS), the Django API, a worker for the voicemail audio, and Asterisk (the calls).
+#
+# All services run on the host network. The audio needs 100 UDP ports, and Docker would run two proxy processes for
+# each published port. So the firewall of the host decides what comes in (README, "Firewall").
+services:
+  caddy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - SERVER_HOST=${SERVER_HOST:?Set SERVER_HOST in .env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+
+  api:
+    build: .
+    restart: unless-stopped
+    network_mode: host
+    env_file: .env
+    environment:
+      - DATABASE_PATH=/data/db.sqlite3
+    command: sh -c "python manage.py migrate --noinput && exec gunicorn lines_server.wsgi -b 127.0.0.1:8000 -w 2 --threads 4 --timeout 120"
+    volumes:
+      - data:/data
+
+  # Keeps the MP3 of each new voicemail message on the server, so a message plays at once.
+  worker:
+    build: .
+    restart: unless-stopped
+    network_mode: host
+    env_file: .env
+    environment:
+      - DATABASE_PATH=/data/db.sqlite3
+    command: sh -c "sleep 30; while true; do python manage.py downloadvoicemail || true; sleep 60; done"
+    depends_on:
+      - api
+    volumes:
+      - data:/data
+
+  asterisk:
+    image: andrius/asterisk:22.8-cert4_alpine-3.24@sha256:8cfd59ae8756244d05c87fb1a12da8eb3e0156d88fbdb0df99f5f13ba2ba19dd
+    restart: unless-stopped
+    network_mode: host
+    entrypoint: ["sh", "/conf/start.sh"]
+    volumes:
+      - ./asterisk:/conf:ro
+    # Only what Asterisk uses, not the whole .env.
+    environment:
+      - PHONE_SIP_PASSWORD=${PHONE_SIP_PASSWORD:?Set PHONE_SIP_PASSWORD in .env}
+      - VOIPMS_SIP_USERNAME=${VOIPMS_SIP_USERNAME:?Set VOIPMS_SIP_USERNAME in .env}
+      - VOIPMS_SIP_PASSWORD=${VOIPMS_SIP_PASSWORD:?Set VOIPMS_SIP_PASSWORD in .env}
+      - VOIPMS_SERVER=${VOIPMS_SERVER:-toronto1.voip.ms}
+      - VOIPMS_MATCH=${VOIPMS_MATCH:-}
+      - PHONE_HOOK_TOKEN=${PHONE_HOOK_TOKEN:?Set PHONE_HOOK_TOKEN in .env}
+    # Healthy means registered with VoIP.ms, which is what the calls need.
+    healthcheck:
+      test: ["CMD-SHELL", "asterisk -rx 'pjsip show registrations' | grep -q Registered"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  caddy_data:
+  data:
