@@ -20,7 +20,7 @@
 
 ## What it does
 
-| | |
+| Feature | What you get |
 |---|---|
 | 💬 **Texts** | Send and get SMS and MMS, with pictures. |
 | 📞 **Calls** | Make and take calls over WebRTC. Forward calls to your cell when you are away. |
